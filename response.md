@@ -3,9 +3,9 @@
 ## A. Required Information
 ### A.1. Requirement Completion Rate
 - [x] List all pharmacies open at a specific time and on a day of the week if requested.
-  - Implemented at PharmacyByOpeningHoursAPI API.
+  - Implemented at PharmacyByOpeningHoursAPI.
 - [x] List all masks sold by a given pharmacy, sorted by mask name or price.
-  - Implemented at xxx API.
+  - Implemented at MasksByPharmacyAPI.
 - [x] List all pharmacies with more or less than x mask products within a price range.
   - Implemented at xxx API.
 - [x] The top x users by total transaction amount of masks within a date range.

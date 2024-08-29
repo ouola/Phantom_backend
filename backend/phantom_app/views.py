@@ -1,9 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Pharmacy
+from .models import Pharmacy, Mask
 import re
 from datetime import datetime
+
+
 
 class PharmacyByOpeningHoursAPI(APIView):
     def get(self, request):
@@ -81,3 +83,34 @@ class PharmacyByOpeningHoursAPI(APIView):
 
         return days #回傳{'Mon', 'Wed', 'Fri',....}
 
+class MasksByPharmacyAPI(APIView):
+    def get(self, request, *args, **kwargs):
+        pharmacy_name = request.query_params.get('pharmacy_name')
+        sort_by = request.query_params.get('sort_by', 'name')  # 默認按名稱排序
+
+        if not pharmacy_name:
+            return Response({'error': 'Pharmacy name is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 確保輸入是 name 或者是 price
+        if sort_by not in ['name', 'price']:
+            return Response({'error': 'Invalid sort_by parameter. Use "name" or "price".'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 找尋藥局名稱
+        pharmacy = Pharmacy.objects.filter(name=pharmacy_name).first()
+        
+        if not pharmacy:
+            return Response({'error': 'Pharmacy not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # 查詢該藥局的口罩並按name或是price排序
+        masks = Mask.objects.filter(pharmacy=pharmacy).order_by(sort_by)
+
+        # 組織回應數據
+        mask_list = [
+            {
+                'name': mask.name,
+                'price': str(mask.price), 
+            }
+            for mask in masks
+        ]
+
+        return Response(mask_list, status=status.HTTP_200_OK)
