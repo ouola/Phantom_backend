@@ -1,10 +1,13 @@
 from django.urls import path
 from .views import (
-    PharmacyByOpeningHoursAPI,
-    MasksByPharmacyAPI,
+    PharmacyByOpeningHoursAPIView,
+    MasksByPharmacyAPIView,
+    PharmaciesByMaskCountAPIView,
 )
 
 urlpatterns = [
-    path('pharmacies/opening-hours/', PharmacyByOpeningHoursAPI.as_view(), name='pharmacies-by-opening-hours'),
-    path('pharmacies/masks/', MasksByPharmacyAPI.as_view(), name='masks-by-pharmacy'),
+    path('pharmacies/opening-hours/', PharmacyByOpeningHoursAPIView.as_view(), name='pharmacies-by-opening-hours'),
+    path('pharmacies/masks/', MasksByPharmacyAPIView.as_view(), name='masks-by-pharmacy'),
+    path('pharmacies/mask-count/', PharmaciesByMaskCountAPIView.as_view(), name='pharmacies_by_mask_count'),
+
 ]

@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 
-class PharmacyByOpeningHoursAPI(APIView):
+class PharmacyByOpeningHoursAPIView(APIView):
     def get(self, request):
         weekday = request.query_params.get('weekday')
         time = request.query_params.get('time')
@@ -83,7 +83,8 @@ class PharmacyByOpeningHoursAPI(APIView):
 
         return days #回傳{'Mon', 'Wed', 'Fri',....}
 
-class MasksByPharmacyAPI(APIView):
+class MasksByPharmacyAPIView(APIView):
+
     def get(self, request, *args, **kwargs):
         pharmacy_name = request.query_params.get('pharmacy_name')
         sort_by = request.query_params.get('sort_by', 'name')  # 默認按名稱排序
@@ -114,3 +115,33 @@ class MasksByPharmacyAPI(APIView):
         ]
 
         return Response(mask_list, status=status.HTTP_200_OK)
+    
+class PharmaciesByMaskCountAPIView(APIView):
+    def get(self, request):
+        comparison = request.query_params.get('comparison')  # 'more' or 'less'
+        count = request.query_params.get('count')
+        min_price = request.query_params.get('min_price', 0)  # 默認為 0
+        max_price = request.query_params.get('max_price') # require
+
+        if not count or not comparison or not max_price:
+            return Response({'error': 'Comparison, count, and max_price parameters are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if comparison not in ['more', 'less']:
+            return Response({'error': 'Comparison must be either "more" or "less".'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            count = int(count)
+            min_price = float(min_price)
+            max_price = float(max_price)
+        except ValueError:
+            return Response({'error': 'Count must be an integer, and min_price and max_price must be floats.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        pharmacies = Pharmacy.objects.all()
+        matching_pharmacies = []
+
+        for pharmacy in pharmacies:
+            mask_count = pharmacy.masks.filter(price__gte=min_price, price__lte=max_price).count()
+            if (comparison == 'more' and mask_count >= count) or (comparison == 'less' and mask_count <= count):
+                matching_pharmacies.append({'name': pharmacy.name, 'mask_count': mask_count})
+
+        return Response(matching_pharmacies, status=status.HTTP_200_OK)
