@@ -27,7 +27,7 @@ class User(models.Model):
 
 class PurchaseHistory(models.Model):
     user = models.ForeignKey(User, related_name='purchases', on_delete=models.CASCADE)
-    pharmacy = models.ForeignKey(Pharmacy, related_name='purchases', on_delete=models.CASCADE)
+    pharmacy = models.CharField(max_length=255)
     mask_name = models.CharField(max_length=255)
     transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateTimeField()
