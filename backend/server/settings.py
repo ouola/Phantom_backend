@@ -88,8 +88,6 @@ DATABASES = {
     }
 }
 
-print(os.getenv('DB_NAME'))
-print(os.getenv('DB_PORT'))
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 

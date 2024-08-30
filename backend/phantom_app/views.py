@@ -188,7 +188,6 @@ class TopUsersByTransactionAPIView(APIView):
 
         return Response(user_data, status=status.HTTP_200_OK)
     
-    from rest_framework.views import APIView
 
 class TotalMasksAndTransactionValueAPIView(APIView):
     def get(self, request):
@@ -267,8 +266,6 @@ class PurchaseMaskAPIView(APIView):
             ### 開始更新用戶數據 ###
 
             previous_purchases = PurchaseHistory.objects.filter(user=user)
-            for purchase in previous_purchases:
-                print(f"{purchase}")
 
             with transaction.atomic():
                 # 更新用戶餘額
@@ -289,8 +286,6 @@ class PurchaseMaskAPIView(APIView):
                 )
 
             updated_purchases = PurchaseHistory.objects.filter(user=user)
-            for purchase in updated_purchases:
-                print(f"{purchase}")
 
             return Response({
                 "message": "Purchase successful",
