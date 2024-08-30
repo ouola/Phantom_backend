@@ -5,6 +5,7 @@ from .views import (
     PharmaciesByMaskCountAPIView,
     TopUsersByTransactionAPIView,
     TotalMasksAndTransactionValueAPIView,
+    SearchAPIView,
 )
 
 urlpatterns = [
@@ -13,5 +14,5 @@ urlpatterns = [
     path('pharmacies/mask-count/', PharmaciesByMaskCountAPIView.as_view(), name='pharmacies_by_mask_count'),
     path('users/top-transactions/', TopUsersByTransactionAPIView.as_view(), name='top_transactions'),
     path('transactions/total/', TotalMasksAndTransactionValueAPIView.as_view(), name='total-masks-and-transaction-value'),
-
+    path('search/', SearchAPIView.as_view(), name='search'),
 ]

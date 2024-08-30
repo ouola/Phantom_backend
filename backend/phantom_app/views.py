@@ -189,7 +189,6 @@ class TopUsersByTransactionAPIView(APIView):
     
     from rest_framework.views import APIView
 
-
 class TotalMasksAndTransactionValueAPIView(APIView):
     def get(self, request):
         start_date = request.query_params.get('start_date')
@@ -224,3 +223,20 @@ class TotalMasksAndTransactionValueAPIView(APIView):
             'total_masks': total_masks,
             'total_amount': total_amount
         }, status=status.HTTP_200_OK)
+
+class SearchAPIView(APIView):
+    def get(self, request):
+        search_term = request.query_params.get('search_term', '')
+
+        if not search_term:
+            return Response({'error': 'search_term parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        pharmacies = Pharmacy.objects.filter(name__icontains=search_term).order_by('name')
+        masks = Mask.objects.filter(name__icontains=search_term).order_by('name')
+
+        results = {
+            'pharmacies': [{'id': pharmacy.id, 'name': pharmacy.name} for pharmacy in pharmacies]if pharmacies.exists() else None,
+            'masks': [{'id': mask.id, 'name': mask.name, 'pharmacy': mask.pharmacy.name} for mask in masks] if masks.exists() else None
+        }
+
+        return Response(results, status=status.HTTP_200_OK)
