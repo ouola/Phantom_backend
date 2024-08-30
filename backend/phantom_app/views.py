@@ -5,7 +5,8 @@ from .models import Pharmacy, Mask, User, PurchaseHistory
 import re
 from datetime import datetime
 from django.db.models import Sum
-
+from django.utils import timezone
+from django.db import transaction
 
 class PharmacyByOpeningHoursAPIView(APIView):
     def get(self, request):
@@ -240,3 +241,73 @@ class SearchAPIView(APIView):
         }
 
         return Response(results, status=status.HTTP_200_OK)
+
+class PurchaseMaskAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        user_name = request.data.get('user_name')
+        pharmacy_name = request.data.get('pharmacy_name')
+        mask_name = request.data.get('mask_name')
+        quantity = request.data.get('quantity',0)  # 默認0個
+
+        # 驗證 quantity 是否為正整數
+        if not isinstance(quantity, int) or quantity <= 0:
+            return Response({"error": "Quantity must be a positive integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # 根據名稱找用戶、藥局和口罩
+            user = User.objects.get(name=user_name)
+            pharmacy = Pharmacy.objects.get(name=pharmacy_name)
+            mask = Mask.objects.get(pharmacy=pharmacy, name=mask_name)
+
+            total_price = mask.price * quantity
+
+            if user.cash_balance < total_price:
+                return Response({"error": "Insufficient user balance"}, status=status.HTTP_400_BAD_REQUEST)
+
+            ### 開始更新用戶數據 ###
+
+            previous_purchases = PurchaseHistory.objects.filter(user=user)
+            for purchase in previous_purchases:
+                print(f"{purchase}")
+
+            with transaction.atomic():
+                # 更新用戶餘額
+                user.cash_balance -= total_price
+                user.save()
+
+                # 更新藥局現金餘額
+                pharmacy.cash_balance += total_price
+                pharmacy.save()
+
+                # 更新購買歷史
+                purchase_history = PurchaseHistory.objects.create(
+                    user=user,
+                    pharmacy=pharmacy.name,
+                    mask_name=mask.name,
+                    transaction_amount=total_price,
+                    transaction_date=timezone.now()
+                )
+
+            updated_purchases = PurchaseHistory.objects.filter(user=user)
+            for purchase in updated_purchases:
+                print(f"{purchase}")
+
+            return Response({
+                "message": "Purchase successful",
+                "purchase_details": {
+                    "user": user.name,
+                    "pharmacy": pharmacy.name,
+                    "mask": mask.name,
+                    "quantity": quantity,
+                    "total_price": total_price
+                }
+            }, status=status.HTTP_201_CREATED)
+
+        except User.DoesNotExist:
+            return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        except Pharmacy.DoesNotExist:
+            return Response({"error": "Pharmacy does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        except Mask.DoesNotExist:
+            return Response({"error": "Mask does not exist in the specified pharmacy"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

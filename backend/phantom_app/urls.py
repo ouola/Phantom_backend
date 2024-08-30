@@ -6,6 +6,7 @@ from .views import (
     TopUsersByTransactionAPIView,
     TotalMasksAndTransactionValueAPIView,
     SearchAPIView,
+    PurchaseMaskAPIView
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('users/top-transactions/', TopUsersByTransactionAPIView.as_view(), name='top_transactions'),
     path('transactions/total/', TotalMasksAndTransactionValueAPIView.as_view(), name='total-masks-and-transaction-value'),
     path('search/', SearchAPIView.as_view(), name='search'),
+    path('purchase-mask/', PurchaseMaskAPIView.as_view(), name='purchase-mask'),
 ]
