@@ -186,3 +186,41 @@ class TopUsersByTransactionAPIView(APIView):
         ]
 
         return Response(user_data, status=status.HTTP_200_OK)
+    
+    from rest_framework.views import APIView
+
+
+class TotalMasksAndTransactionValueAPIView(APIView):
+    def get(self, request):
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+
+        if not start_date or not end_date:
+            return Response({'error': 'start_date and end_date parameters are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 確保日期格式正確
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        except ValueError:
+            return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if start_date > end_date:
+            return Response({'error': 'Start date must be before or equal to end date.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 計算總面罩數量和交易總額
+        total_masks = PurchaseHistory.objects.filter(
+            transaction_date__range=[start_date, end_date]
+        ).count()  # 總面罩數量（記錄數量）
+
+        total_amount = PurchaseHistory.objects.filter(
+            transaction_date__range=[start_date, end_date]
+        ).aggregate(total_amount=Sum('transaction_amount'))['total_amount']  # 總交易金額
+
+        if total_amount is None:
+            total_amount = 0  # 如果沒有記錄，設置為 0
+
+        return Response({
+            'total_masks': total_masks,
+            'total_amount': total_amount
+        }, status=status.HTTP_200_OK)

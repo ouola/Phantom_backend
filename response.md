@@ -11,7 +11,7 @@
 - [x] The top x users by total transaction amount of masks within a date range.
   - Implemented at TopUsersByTransactionAPIView API.
 - [x] The total number of masks and dollar value of transactions within a date range.
-  - Implemented at xxx API.
+  - Implemented at TotalMasksAndTransactionValueAPIView API.
 - [x] Search for pharmacies or masks by name, ranked by relevance to the search term.
   - Implemented at xxx API.
 - [x] Process a user purchases a mask from a pharmacy, and handle all relevant data changes in an atomic transaction.
