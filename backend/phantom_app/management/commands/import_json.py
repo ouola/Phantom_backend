@@ -50,20 +50,35 @@ class Command(BaseCommand):
 
     def import_pharmacies(self, data):
         for entry in data:
-            pharmacy, created = Pharmacy.objects.get_or_create(
-                name=entry['name'],
-                cash_balance=entry['cashBalance'],
-                opening_hours=entry['openingHours']
-            )
+            try:
+                # 使用 get_or_create 來獲取或創建藥局
+                pharmacy, created = Pharmacy.objects.get_or_create(
+                    name=entry['name'],
+                    defaults={
+                        'cash_balance': entry['cashBalance'],
+                        'opening_hours': entry['openingHours']
+                    }
+                )
+            except IntegrityError:
+                # 如果遇到 IntegrityError，跳過當前條目或進行其他處理
+                print(f"Pharmacy '{entry['name']}' already exists. Skipping.")
+                continue
 
             for mask_entry in entry['masks']:
-                mask, mask_created = Mask.objects.get_or_create(
-                    name=mask_entry['name'],
-                    pharmacy=pharmacy,
-                    defaults={'price': mask_entry['price']}
-                )
+                try:
+                    # 使用 get_or_create 來獲取或創建口罩
+                    mask, mask_created = Mask.objects.get_or_create(
+                        name=mask_entry['name'],
+                        pharmacy=pharmacy,
+                        defaults={'price': mask_entry['price']}
+                    )
+                except IntegrityError:
+                    # 如果遇到 IntegrityError，跳過當前條目或進行其他處理
+                    print(f"Mask '{mask_entry['name']}' already exists for pharmacy '{pharmacy.name}'. Skipping.")
+                    continue
 
-                # 如果 get_or_create() 失敗時返回多個對象，處理邏輯
+                # 如果找到現有的 mask 並且價格有變動，則更新價格
                 if not mask_created:
-                    mask.price = mask_entry['price']
-                    mask.save()
+                    if mask.price != mask_entry['price']:
+                        mask.price = mask_entry['price']
+                        mask.save()
