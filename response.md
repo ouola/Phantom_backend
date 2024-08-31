@@ -3,6 +3,7 @@
 - Database = MySQL
 - pip install -r requirements.txt
 - Duplicate [example.env](example.env) file and rename to `.env`, and modify it to your Database setting.
+- use `python manage.py makemigrations` and `python manage.py migrate` if first time to use this project.
 ## A. Required Information
 ### A.1. Requirement Completion Rate
 - [x] List all pharmacies open at a specific time and on a day of the week if requested.
@@ -21,7 +22,7 @@
   - Implemented at `PurchaseMaskAPIView` API.
 ### A.2. API Document
 
-See [API document](API_Document.md) to know how to use each API
+See [API document](API_Document.md) to know how to use each API.
 
 ### A.3. Import Data Commands
 Please run these two script commands to migrate the data into the database.
