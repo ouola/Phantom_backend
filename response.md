@@ -1,22 +1,24 @@
 # Response
 - Python = 3.12.4
 - Database = MySQL
+- pip install -r requirements.txt
+- Duplicate [example.env](example.env) file and rename to `.env`, and modify it to your Database setting.
 ## A. Required Information
 ### A.1. Requirement Completion Rate
 - [x] List all pharmacies open at a specific time and on a day of the week if requested.
-  - Implemented at PharmacyByOpeningHoursAPIView API.
+  - Implemented at `PharmacyByOpeningHoursAPIView` API.
 - [x] List all masks sold by a given pharmacy, sorted by mask name or price.
-  - Implemented at MasksByPharmacyAPIView API.
+  - Implemented at `MasksByPharmacyAPIView` API.
 - [x] List all pharmacies with more or less than x mask products within a price range.
-  - Implemented at PharmaciesByMaskCountAPIView API.
+  - Implemented at `PharmaciesByMaskCountAPIView` API.
 - [x] The top x users by total transaction amount of masks within a date range.
-  - Implemented at TopUsersByTransactionAPIView API.
+  - Implemented at `TopUsersByTransactionAPIView` API.
 - [x] The total number of masks and dollar value of transactions within a date range.
-  - Implemented at TotalMasksAndTransactionValueAPIView API.
+  - Implemented at `TotalMasksAndTransactionValueAPIView` API.
 - [x] Search for pharmacies or masks by name, ranked by relevance to the search term.
-  - Implemented at SearchAPIView API.
+  - Implemented at `SearchAPIView` API.
 - [x] Process a user purchases a mask from a pharmacy, and handle all relevant data changes in an atomic transaction.
-  - Implemented at PurchaseMaskAPIView API.
+  - Implemented at `PurchaseMaskAPIView` API.
 ### A.2. API Document
 
 See [API document](API_Document.md) to know how to use each API
