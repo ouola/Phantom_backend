@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 cash_balance=entry['cashBalance']
             )
             
-            # 檢查 purchaseHistory 鍵是否存在
+            # 檢查 purchaseHistory是否存在
             if 'purchaseHistories' not in entry:
                 self.stdout.write(self.style.WARNING(f"User {entry['name']} has no purchase history. Skipping."))
                 continue
@@ -51,7 +51,6 @@ class Command(BaseCommand):
     def import_pharmacies(self, data):
         for entry in data:
             try:
-                # 使用 get_or_create 來獲取或創建藥局
                 pharmacy, created = Pharmacy.objects.get_or_create(
                     name=entry['name'],
                     defaults={
@@ -60,20 +59,17 @@ class Command(BaseCommand):
                     }
                 )
             except IntegrityError:
-                # 如果遇到 IntegrityError，跳過當前條目或進行其他處理
                 print(f"Pharmacy '{entry['name']}' already exists. Skipping.")
                 continue
 
             for mask_entry in entry['masks']:
                 try:
-                    # 使用 get_or_create 來獲取或創建口罩
                     mask, mask_created = Mask.objects.get_or_create(
                         name=mask_entry['name'],
                         pharmacy=pharmacy,
                         defaults={'price': mask_entry['price']}
                     )
                 except IntegrityError:
-                    # 如果遇到 IntegrityError，跳過當前條目或進行其他處理
                     print(f"Mask '{mask_entry['name']}' already exists for pharmacy '{pharmacy.name}'. Skipping.")
                     continue
 

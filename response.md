@@ -1,5 +1,6 @@
 # Response
-> The Current content is an **example template**; please edit it to fit your style and content.
+- Python = 3.12.4
+- Database = MySQL
 ## A. Required Information
 ### A.1. Requirement Completion Rate
 - [x] List all pharmacies open at a specific time and on a day of the week if requested.
@@ -17,16 +18,16 @@
 - [x] Process a user purchases a mask from a pharmacy, and handle all relevant data changes in an atomic transaction.
   - Implemented at PurchaseMaskAPIView API.
 ### A.2. API Document
-> Please describe how to use the API in the API documentation. You can edit by any format (e.g., Markdown or OpenAPI) or free tools (e.g., [hackMD](https://hackmd.io/), [postman](https://www.postman.com/), [google docs](https://docs.google.com/document/u/0/), or  [swagger](https://swagger.io/specification/)).
 
-Import [this](#api-document) json file to Postman.
+See [API document](API_Document.md) to know how to use each API
 
 ### A.3. Import Data Commands
 Please run these two script commands to migrate the data into the database.
 
 ```bash
-$ rake import_data:pharmacies[PATH_TO_FILE]
-$ rake import_data:users[PATH_TO_FILE]
+$ cd backend
+$ python manage.py import_json users [FILE_PATH]
+$ python manage.py import_json pharmacies [FILE_PATH]
 ```
 ## B. Bonus Information
 
