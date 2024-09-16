@@ -3,11 +3,13 @@
 
 ### URL
 - `GET` `pharmacies/by-opening-hours/`
+### Example(Postman)
+- `pharmacies/by-opening-hours/weekday=Sun&time=23:59`
 
 ### 介紹
 此API用於查詢在指定星期幾和時間內開放的藥局。
 
-### 參數
+### Query Parameters
 
 | 參數名稱 | 類型 | 必填 | 描述                 |
 |----------|------|------|----------------------|
@@ -45,11 +47,13 @@
 
 ### URL
 - `GET` `pharmacies/masks/`
+### Example(Postman)
+- `pharmacies/masks/?pharmacy_name=DFW Wellness&sort_by=name`
 
 ### 介紹
 此API用於查詢指定藥局的口罩資訊，並可以按名稱或價格排序。
 
-### 參數
+### Query Parameters
 
 | 參數名稱       | 類型   | 必填 | 描述                           |
 | -------------- | ------ | ---- | -------------------------------- |
@@ -89,11 +93,13 @@
 
 ## URL 
 - `GET` `pharmacies/mask-count/`
+### Example(Postman)
+- `pharmacies/mask-count/?comparison=more&count=5&min_price=0&max_price=20`
 
 ### 介紹 
 此 API 用於查詢擁有指定數量以上或以下口罩的藥局。
 
-### 參數
+### Query Parameters
 
 | 參數名稱   | 類型  | 必填 | 描述                           |
 |------------|-------|------|--------------------------------|
@@ -129,7 +135,7 @@
 	- **`comparison ` 參數錯誤:**
 	  ```json
 	  {
- 		 "error": "Comparison must be either \"more\" or \"less\"."
+ 		"error": "Comparison must be either more or less."
 	  }
 	- **參數類型錯誤:**
 	  ```json
@@ -142,12 +148,14 @@
 ### URL
 
 - `GET` `users/top-transactions/`
+### Example(Postman)
+- `users/top-transactions/?top_x=3&start_date=2021-01-20&end_date=2021-01-26`
 
 ### 介紹
 
 此 API 用於查詢指定日期範圍內交易總金額最高的前 `top_x` 用戶。
 
-### 參數
+### Query Parameters
 
 | 參數名稱   | 類型     | 必填 | 描述                                     |
 |------------|----------|------|------------------------------------------|
@@ -198,12 +206,13 @@
 ### URL
 
 - `GET` `transactions/total/`
-
+### Example(Postman)
+- `transactions/total/?start_date=2021-01-20&end_date=2021-01-26`
 ### 介紹
 
 此 API 用於計算指定日期範圍內的總面罩數量和總交易金額。
 
-### 參數
+### Query Parameters
 
 | 參數名稱   | 類型     | 必填 | 描述                                     |
 |------------|----------|------|------------------------------------------|
@@ -241,12 +250,13 @@
 ### URL
 
 - `GET` `search/`
-
+### Example
+- `search/?search_term=Mask`
 ### 介紹
 
 此 API 用於根據搜索關鍵詞查詢藥局和口罩。返回匹配的藥局和口罩列表。
 
-### 參數
+### Query Parameters
 
 | 參數名稱     | 類型     | 必填 | 描述                       |
 |--------------|----------|------|----------------------------|
@@ -285,11 +295,22 @@
 
 - `POST` `purchase-mask/`
 
+### Example
+- `purchase-mask/`
+#### Request Body
+```json
+{
+    "user_name": "Yvonne Guerrero",
+    "pharmacy_name": "HealthMart",
+    "mask_name": "Cotton Kiss (green) (3 per pack)",
+    "quantity": 2
+}
+```
 ### 介紹
 
 此 API 用於處理用戶購買口罩的請求。當用戶購買口罩時，會檢查用戶的餘額，更新用戶和藥局的現金餘額，並記錄購買歷史。
 
-### 參數
+### Request Body
 
 | 參數名稱      | 類型     | 必填 | 描述                             |
 |---------------|----------|------|----------------------------------|
