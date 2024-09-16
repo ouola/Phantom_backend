@@ -114,16 +114,17 @@ class TopUsersByTransactionAPIView(APIView):
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
 
+        # 驗證必要參數
         if not top_x or not start_date or not end_date:
             return Response({'error': 'top_x, start_date, and end_date parameters are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 確保 top_x 是否為整數
+        # 確保 top_x 為整數
         try:
             top_x = int(top_x)
         except ValueError:
             return Response({'error': 'top_x must be an integer.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 確保日期格式
+        # 驗證日期格式
         try:
             start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
             end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
@@ -134,20 +135,22 @@ class TopUsersByTransactionAPIView(APIView):
         if end_date < start_date:
             return Response({'error': 'end_date cannot be before start_date.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 查詢 top_x 用戶，按交易總金額 大->小
+        # 查詢 top_x 用戶，按交易總金額排序
         top_users = User.objects.filter(
-            purchases__transaction_date__range=[start_date, end_date]
-        ).annotate(total_amount=Sum('purchases__transaction_amount')).order_by('-total_amount')[:top_x]
+            purchase_histories__transaction_date__range=[start_date, end_date]
+        ).annotate(total_amount=Sum('purchase_histories__transaction_amount')).order_by('-total_amount')[:top_x]
 
+        # 構建返回資料
         user_data = [
             {
-            'name': user.name,
-            'total_amount': user.total_amount
+                'name': user.name,
+                'total_amount': user.total_amount
             }
             for user in top_users
         ]
 
         return Response(user_data, status=status.HTTP_200_OK)
+
     
 
 class TotalMasksAndTransactionValueAPIView(APIView):
