@@ -4,7 +4,7 @@ from rest_framework import status
 from .models import Pharmacy, Mask, User, PurchaseHistory, OpeningHour
 import re
 from datetime import datetime
-from django.db.models import Sum
+from django.db.models import Sum, Case, When, IntegerField
 from django.utils import timezone
 from django.db import transaction
 
@@ -195,11 +195,27 @@ class SearchAPIView(APIView):
         if not search_term:
             return Response({'error': 'search_term parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        pharmacies = Pharmacy.objects.filter(name__icontains=search_term).order_by('name')
-        masks = Mask.objects.filter(name__icontains=search_term).order_by('name')
+        # 查詢藥局和口罩，並按關聯性排序
+        pharmacies = Pharmacy.objects.filter(name__icontains=search_term).annotate(
+            relevance=Case(
+                When(name__istartswith=search_term, then=2),
+                When(name__iexact=search_term, then=1),
+                default=0,
+                output_field=IntegerField(),
+            )
+        ).order_by('-relevance', 'name')
+
+        masks = Mask.objects.filter(name__icontains=search_term).annotate(
+            relevance=Case(
+                When(name__istartswith=search_term, then=2),
+                When(name__iexact=search_term, then=1),
+                default=0,
+                output_field=IntegerField(),
+            )
+        ).order_by('-relevance', 'name')
 
         results = {
-            'pharmacies': [{'id': pharmacy.id, 'name': pharmacy.name} for pharmacy in pharmacies]if pharmacies.exists() else None,
+            'pharmacies': [{'id': pharmacy.id, 'name': pharmacy.name} for pharmacy in pharmacies] if pharmacies.exists() else None,
             'masks': [{'id': mask.id, 'name': mask.name, 'pharmacy': mask.pharmacy.name} for mask in masks] if masks.exists() else None
         }
 
@@ -210,7 +226,7 @@ class PurchaseMaskAPIView(APIView):
         user_name = request.data.get('user_name')
         pharmacy_name = request.data.get('pharmacy_name')
         mask_name = request.data.get('mask_name')
-        quantity = request.data.get('quantity',0)  # 默認0個
+        quantity = request.data.get('quantity', 0)  # 默認0個
 
         # 驗證 quantity 是否為正整數
         if not isinstance(quantity, int) or quantity <= 0:
@@ -227,10 +243,6 @@ class PurchaseMaskAPIView(APIView):
             if user.cash_balance < total_price:
                 return Response({"error": "Insufficient user balance"}, status=status.HTTP_400_BAD_REQUEST)
 
-            ### 開始更新用戶數據 ###
-
-            previous_purchases = PurchaseHistory.objects.filter(user=user)
-
             with transaction.atomic():
                 # 更新用戶餘額
                 user.cash_balance -= total_price
@@ -243,13 +255,12 @@ class PurchaseMaskAPIView(APIView):
                 # 更新購買歷史
                 purchase_history = PurchaseHistory.objects.create(
                     user=user,
-                    pharmacy=pharmacy.name,
+                    pharmacy_name=pharmacy.name,
                     mask_name=mask.name,
                     transaction_amount=total_price,
-                    transaction_date=timezone.now()
+                    transaction_date=timezone.now().date(),  # 只取日期部分
+                    transaction_time=timezone.now().time(),  # 只取時間部分
                 )
-
-            updated_purchases = PurchaseHistory.objects.filter(user=user)
 
             return Response({
                 "message": "Purchase successful",
