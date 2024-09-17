@@ -2,9 +2,9 @@
 ## 1. PharmacyByOpeningHoursAPIView
 
 ### URL
-- `GET` `pharmacies/by-opening-hours/`
+- `GET` `pharmacies/opening-hours/`
 ### Example(Postman)
-- `pharmacies/by-opening-hours/weekday=Sun&time=23:59`
+- `pharmacies/opening-hours/?weekday=Sun&time=23:59`
 
 ### 介紹
 此API用於查詢在指定星期幾和時間內開放的藥局。
